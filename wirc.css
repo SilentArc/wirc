@@ -1,0 +1,121 @@
+body { font-family: Calibri, Verdana, Tahoma, Optima, Arial, sans-serif; font-size: 16px; }
+a.url { word-break: break-all; }
+
+#chatbox {height: 100%; width: 100%; position: relative;}
+
+#chatHead {height: 25px; width: 100%; background-color: #F0F0F0;}
+.channelSwitch {float: left; border:1px solid black; background-color: #EEEEEE; border-radius: 5px 5px 0px 0px; cursor: pointer; }
+.specialSwitch {float: right; }
+.switchSelected  { background-color: #FFFFFF; cursor: pointer; }
+.channelActivity { background-color: #EEEEFF; cursor: pointer; }
+.channelDropDownArrow { color: #CCCCCC; }
+
+.chatArea { height: calc(100% - 21px); width: 100%; }
+.chatText { height: calc(100% - 21px); overflow-y: scroll; word-wrap: break-word; }
+.actionLink { color: blueviolet; }
+#dropdownMenu { position: absolute; top: 21px; left: 5px; z-index: 1; background-color: #EEEEFF; border: 2px solid black; cursor: pointer; }
+
+.helpBox { display: none; background-color: #EEEEFF; }
+.help {width: 100%; background-color: #EEEEFF;}
+
+.optionBox { display: none; background-color: #EEEEFF; }
+.option { border: 1px solid black; cursor: pointer; }
+.optionHeader { font-weight: bold; }
+.optionOn  { background-color: #99DD99; }
+.optionOff { background-color: #DD9999; }
+
+.chatInput {height: 21px; width: 100% ; }
+.input {width: calc(100% - 64px); vertical-align: middle;}
+.send {width: 64px; vertical-align: middle; float: right;}
+
+.ircText { display: flex; width: 100%; overflow: auto; }
+.ircText.light {background-color: white; }
+.ircText.dark {background-color: whitesmoke; }
+.ircText.light.self {background-color: ghostwhite; }
+.ircText.dark.self {background-color: lavender; }
+.ircText.light.info {background-color: honeydew; }
+.ircText.dark.info {background-color: #DDFFDD; }
+.ircText.light.error {background-color: lavenderblush; }
+.ircText.dark.error {background-color: mistyrose; }
+.ircText.light.highlight { background-color: floralwhite; }
+.ircText.dark.highlight { background-color: papayawhip; }
+	.ircText .messageNick {color: midnightblue; cursor: pointer; }
+	.ircText .messageContainer { order: 2; white-space: pre-wrap; flex-grow: 1; overflow-x: inherit; }
+	.ircText .spacer{color: slategrey;}
+	.ircText .action {color: midnightblue;}
+	.ircText .time { color: dimgrey; order: 1; float: left; padding-right: 5px;}
+	.ircText .mode {color: darkgrey;}
+	.ircText .join {color: darkgreen;}
+	.ircText .nick {color: darkgreen;}
+	.ircText .part {color: darkred;}
+	.ircText .kick {color: darkred;}
+	.ircText .quit {color: darkred;}
+	.ircText .notice {color: maroon;}
+	.ircText .info {color: navy;}
+	.ircText .warning {color: orangered;}
+	.ircText .error {font-weight: bold; color: red;}
+	.ircText .fc0 {color: white;}
+	.ircText .fc1 {color: black;}
+	.ircText .fc2 {color: mediumblue;}
+	.ircText .fc3 {color: green;}
+	.ircText .fc4 {color: red;}
+	.ircText .fc5 {color: brown;}
+	.ircText .fc6 {color: purple;}
+	.ircText .fc7 {color: orange;}
+	.ircText .fc8 {color: yellow;}
+	.ircText .fc9 {color: lightgreen; }
+	.ircText .fc10 { color: darkcyan; }
+	.ircText .fc11 { color: lightcyan; }
+	.ircText .fc12 { color: blue; }
+	.ircText .fc13 { color: fuchsia; }
+	.ircText .fc14 { color: grey; }
+	.ircText .fc15 { color: lightgrey; }
+	.ircText .bc0 { background-color: white; }
+	.ircText .bc1 { background-color: black; }
+	.ircText .bc2 { background-color: mediumblue; }
+	.ircText .bc3 { background-color: green; }
+	.ircText .bc4 { background-color: red; }
+	.ircText .bc5 { background-color: brown; }
+	.ircText .bc6 { background-color: purple; }
+	.ircText .bc7 { background-color: orange; }
+	.ircText .bc8 { background-color: yellow; }
+	.ircText .bc9 { background-color: lightgreen; }
+	.ircText .bc10 { background-color: darkcyan; }
+	.ircText .bc11 { background-color: lightcyan; }
+	.ircText .bc12 { background-color: blue; }
+	.ircText .bc13 { background-color: fuchsia; }
+	.ircText .bc14 { background-color: grey; }
+	.ircText .bc15 { background-color: lightgrey; }
+	.ircText .bold { font-weight: bold; }
+	.ircText .italic { font-style: italic; }
+	.ircText .strikethrough{ text-decoration: line-through; }
+	.ircText .underline { text-decoration: underline; }	
+
+.chatSidebar {
+	height: calc( 100% - 21px );
+	overflow-y: scroll;
+	overflow-x: hidden;
+	float: right;
+	display: none;
+	background-color: #FFFFFF;
+}	
+.userlist.light {
+	background-color: white;
+	width: 100%;
+	cursor: pointer;
+}
+.userlist.dark {
+	background-color: whitesmoke; 
+	width: 100%;
+	cursor: pointer; 
+}
+.thumbnail { 
+	display: block;
+	max-width: 200px;
+	max-height: 100px;
+	width: auto;
+	height: auto;
+}
+.thumbnailContainer {
+	order: 3;
+}
