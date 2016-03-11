@@ -83,7 +83,7 @@
 		var saveIgnores = function (){
 			if ( list.length > 0 ) localStorage.setItem( 'ignores' + optionKey , JSON.stringify( list ) );
 			else localStorage.removeItem( 'ignores' + optionKey );
-			redrawIgnoreList();
+			optionUI.redrawIgnoreList();
 		}
 		
 		this.getList = function () {

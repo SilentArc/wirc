@@ -1,4 +1,4 @@
-/*! wirc - v0.0.515 - 2016-03-10 */
+/*! wirc - v0.0.521 - 2016-03-11 */
 
 (function(){
 	var address = $( document.currentScript ).attr( 'data-addr' );
@@ -85,7 +85,7 @@
 		var saveIgnores = function (){
 			if ( list.length > 0 ) localStorage.setItem( 'ignores' + optionKey , JSON.stringify( list ) );
 			else localStorage.removeItem( 'ignores' + optionKey );
-			redrawIgnoreList();
+			optionUI.redrawIgnoreList();
 		}
 		
 		this.getList = function () {
@@ -421,11 +421,11 @@
 			var source = ( message.self === true ? config.nick : message.prefix.split( '!' )[ 0 ] );
 			if ( message.params[ 1 ].charCodeAt( 0 ) === 1 ){
 				if ( message.params[ 1 ].indexOf( '\u0001ACTION' ) === 0 ) forward.channel( message.params[ 0 ], '<span class="action">' + compose.text( '* ' + source + message.params[ 1 ].slice( 7, -1 ) ) + '</span>', ( message.self === true ? 'self' : void( 0 ) ) );
-				else if ( message.params[ 1 ] === '\u0001VERSION\u0001' ) irc.notice( ( message.params[ 0 ] === config.nick ? source : message.params[ 0 ] ) , String.fromCharCode( 1 ) + 'VERSION ' + 'build 515' + String.fromCharCode( 1 ) );
+				else if ( message.params[ 1 ] === '\u0001VERSION\u0001' ) irc.notice( ( message.params[ 0 ] === config.nick ? source : message.params[ 0 ] ) , String.fromCharCode( 1 ) + 'VERSION ' + 'pre alpha build' + String.fromCharCode( 1 ) );
 				else if ( message.params[ 1 ] === '\u0001TIME\u0001' ) irc.notice( ( message.params[ 0 ] === config.nick ? source : message.params[ 0 ] ) , String.fromCharCode(1) + 'TIME ' + new Date().toLocaleString() + String.fromCharCode(1) );
 				//else if ( message.params[ 1 ] === '\u0001AVATAR\u0001' ) forward.console( 'CTCP AVATAR request from ' + source + ' ignored' );	// just say no to avatars in irc
 				else if ( message.params[ 1 ] === '\u0001SOURCE\u0001' ) irc.notice( ( message.params[ 0 ] === config.nick ? source : message.params[ 0 ] ) , String.fromCharCode( 1 ) + 'SOURCE ' + 'https://github.com/SilentArc/wirc' + String.fromCharCode( 1 ) );
-				else if ( message.params[ 1 ] === '\u0001FINGER\u0001' ) irc.notice( ( message.params[ 0 ] === config.nick ? source : message.params[ 0 ] ) , String.fromCharCode( 1 ) + 'FINGER ' + 'oh really' + String.fromCharCode( 1 ) );
+				else if ( message.params[ 1 ] === '\u0001FINGER\u0001' ) irc.notice( ( message.params[ 0 ] === config.nick ? source : message.params[ 0 ] ) , String.fromCharCode( 1 ) + 'FINGER ' + 'kinky' + String.fromCharCode( 1 ) );
 				//else if ( message.params[ 1 ] === '\u0001CLIENTINFO\u0001' ) irc.notice( ( message.params[ 0 ] === config.nick ? source : message.params[ 0 ] ) , String.fromCharCode( 1 ) + 'CLIENTINFO ' + 'something something ctcp list?' + String.fromCharCode( 1 ) );
 				//else if ( message.params[ 1 ] === '\u0001USERINFO\u0001' ) // technically unless we give the user a way to set this it shouldn't return anything	// give it a setting in options?
 				else if ( message.params[ 1 ].split( ' ' )[ 0 ] === '\u0001PING' ) irc.notice( ( message.params[ 0 ] === config.nick ? source : message.params[ 0 ] ) , message.params[ 1 ] );
@@ -490,12 +490,15 @@
 		},
 		'NICK': function( message ){
 			var oldNick = message.prefix.split( '!' )[ 0 ];
-			//createOption('ignoreFollow','Follow nick changes and ignore those as well');
-			//createOption('ignoreAbandon','Remove ignores for ignored nicks changed away from');
+			
 			if ( oldNick === config.nick ) {
 				config.updateNick( message.params[ 0 ] );
 				forward.console( '<span class="nick">' + compose.html( oldNick + ' is now known as ' + message.params[ 0 ] ) + '</span>' );
 			}
+
+			if ( options.ignoreFollow === true && ignoreList.onList( oldNick ) === true )ignoreList.add( message.params[ 0 ] );
+			if ( options.ignoreAbandon === true && ignoreList.onList( oldNick ) === true ) ignoreList.remove( oldNick );
+
 			for ( var index in channels ) {
 				if ( index !== ':Console' ) channels[ index ].user.nick( oldNick , message.params[ 0 ] );
 			}
@@ -707,7 +710,7 @@
 		},
 		'notification': function( message, type ){
 			var active = $( 'div.chatArea:visible' ).attr( 'title' );
-			if ( active !== undefined && active !== ':Console' ) forward.channel( active, message, type );
+			if ( active !== undefined && active.charAt( 0 ) !== ':' ) forward.channel( active, message, type );
 			forward.console( message, type );
 		},
 		'ignore': function ( message ){
@@ -1226,6 +1229,7 @@
 			helptext += '<div>highlight by additional/selective words/regex</div>';
 			helptext += '<div>channel tab highlight option to trigger only on messages/different colours for joins/parts, messages and highlights</div>';
 			helptext += '<div>stylesheet choices</div>';
+			helptext += '<div>bake css into javascript</div>';
 			helptext += '<div>revisit allowing channel windows to remain open on part/kick/disconnect</div>';
 		helptext += '</div>';
 	$( 'div.helpBox' ).html( helptext );
@@ -1554,7 +1558,6 @@
 		return 'Creep_' + Math.random().toString( 36 ).substring( 2, 9 );
 	}
 
-	
 	$( document ).ready( function() {
 		socket.connect();
 	});
