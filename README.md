@@ -15,10 +15,10 @@ Wirc will empty and fill the parental element and include wirc.css itself.
 ## Build
 1. Change to the project's root directory
 2. Install dependencies
-```
-npm install
-```
+  ```
+  npm install
+  ```
 3. Run grunt to build
-```
-grunt
-```
+  ```
+  grunt
+  ```
