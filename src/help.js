@@ -40,6 +40,7 @@
 			helptext += '<div>highlight by additional/selective words/regex</div>';
 			helptext += '<div>channel tab highlight option to trigger only on messages/different colours for joins/parts, messages and highlights</div>';
 			helptext += '<div>stylesheet choices</div>';
+			helptext += '<div>bake css into javascript</div>';
 			helptext += '<div>revisit allowing channel windows to remain open on part/kick/disconnect</div>';
 		helptext += '</div>';
 	$( 'div.helpBox' ).html( helptext );
