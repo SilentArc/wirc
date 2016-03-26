@@ -1,4 +1,4 @@
-/*! wirc - v0.0.522 - 2016-03-26 */
+/*! wirc - v0.0.523 - 2016-03-27 */
 
 (function(){
 	var address = $( document.currentScript ).attr( 'data-addr' );
@@ -455,7 +455,7 @@
 			else {
 				var consumingModes = ['O','o','v','k','l','b','e','I'];	// this should be outside? maybe the entire parser should be?
 
-				channels[ message.params[ 0 ] ].line( '<span class="nick">' + compose.html( ( message.prefix === null ? config.nick : message.prefix.split( '!' )[ 0 ] ) + ' has set mode: ' + message.params.slice( 1 ).join( ' ' ) ) + '</span>');
+				if ( options.modes === true ) channels[ message.params[ 0 ] ].line( '<span class="nick">' + compose.html( ( message.prefix === null ? config.nick : message.prefix.split( '!' )[ 0 ] ) + ' has set mode: ' + message.params.slice( 1 ).join( ' ' ) ) + '</span>');
 				
 				var modeArray = message.params.slice( 1 );
 				while ( modeArray.length > 0 ){
@@ -935,7 +935,7 @@
 			endOfNames = true;
 		}
 		this.join = function(nick){
-			channels[ channelName ].line('<span class="join">' + compose.html( nick +' has joined '+ channelName ) + '</span>');
+			if ( options.joins === true ) channels[ channelName ].line('<span class="join">' + compose.html( nick +' has joined '+ channelName ) + '</span>');
 			channels[ channelName ].user.add( nick, nick );
 			channels[ channelName ].user.update();
 		}
@@ -967,13 +967,13 @@
 			}
 		}
 		this.part = function( nick, message ){
-			channels[ channelName ].line( '<span class="part">' + compose.html(nick +' has left '+ channelName + ( typeof message === 'undefined' ? '': ': ' +  message ) ) + '</span>' );
+			if ( options.joins === true ) channels[ channelName ].line( '<span class="part">' + compose.html(nick +' has left '+ channelName + ( typeof message === 'undefined' ? '': ': ' +  message ) ) + '</span>' );
 			$userSidebar.find( 'div.userlist[title="' + nick + '"]' ).remove();
 			channels[ channelName ].user.update();
 		}
 		this.quit = function(nick, message){
 			if ( $userSidebar.find( 'div.userlist[title="' + nick + '"]' ).length > 0 ){
-				channels[ channelName ].line( '<span class="quit">' + compose.html( nick + ' has quit: ' + message ) + '</span>' );
+				if ( options.joins === true ) channels[ channelName ].line( '<span class="quit">' + compose.html( nick + ' has quit: ' + message ) + '</span>' );
 				$userSidebar.find( 'div.userlist[title="' + nick + '"]' ).remove();
 				channels[ channelName ].user.update();
 			}
@@ -1288,10 +1288,14 @@
 			$( 'button.optionButton[data-id="' + id + '"]' ).on( 'click', function( event ){
 				event.preventDefault();
 				var id = $( this ).attr( 'data-id' );
-				var rawInput = $( 'input.optionInput[data-id="' + id + '"]' ).val().split(',');
-				var arrayInput = [];
-				for ( var index = 0; index < rawInput.length; index++ ) arrayInput.push( compose.saneInput( rawInput[ index ].trim() ) );
-				options[ id ] = arrayInput;
+				var rawInput = $( 'input.optionInput[data-id="' + id + '"]' ).val();
+				if ( rawInput === null || rawInput.length === 0 ) options[ id ] = [];
+				else {
+					rawInput = rawInput.split(',');
+					var arrayInput = [];
+					for ( var index = 0; index < rawInput.length; index++ ) arrayInput.push( compose.saneInput( rawInput[ index ].trim() ) );
+					options[ id ] = arrayInput;
+				}
 				saveOptions();
 				$( '#option_' + id ).append( '<span class="optionResult">Saved!</span>' );
 				setTimeout( function(){

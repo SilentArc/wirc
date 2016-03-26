@@ -52,10 +52,14 @@
 			$( 'button.optionButton[data-id="' + id + '"]' ).on( 'click', function( event ){
 				event.preventDefault();
 				var id = $( this ).attr( 'data-id' );
-				var rawInput = $( 'input.optionInput[data-id="' + id + '"]' ).val().split(',');
-				var arrayInput = [];
-				for ( var index = 0; index < rawInput.length; index++ ) arrayInput.push( compose.saneInput( rawInput[ index ].trim() ) );
-				options[ id ] = arrayInput;
+				var rawInput = $( 'input.optionInput[data-id="' + id + '"]' ).val();
+				if ( rawInput === null || rawInput.length === 0 ) options[ id ] = [];
+				else {
+					rawInput = rawInput.split(',');
+					var arrayInput = [];
+					for ( var index = 0; index < rawInput.length; index++ ) arrayInput.push( compose.saneInput( rawInput[ index ].trim() ) );
+					options[ id ] = arrayInput;
+				}
 				saveOptions();
 				$( '#option_' + id ).append( '<span class="optionResult">Saved!</span>' );
 				setTimeout( function(){

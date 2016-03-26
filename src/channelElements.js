@@ -148,7 +148,7 @@
 			endOfNames = true;
 		}
 		this.join = function(nick){
-			channels[ channelName ].line('<span class="join">' + compose.html( nick +' has joined '+ channelName ) + '</span>');
+			if ( options.joins === true ) channels[ channelName ].line('<span class="join">' + compose.html( nick +' has joined '+ channelName ) + '</span>');
 			channels[ channelName ].user.add( nick, nick );
 			channels[ channelName ].user.update();
 		}
@@ -180,13 +180,13 @@
 			}
 		}
 		this.part = function( nick, message ){
-			channels[ channelName ].line( '<span class="part">' + compose.html(nick +' has left '+ channelName + ( typeof message === 'undefined' ? '': ': ' +  message ) ) + '</span>' );
+			if ( options.joins === true ) channels[ channelName ].line( '<span class="part">' + compose.html(nick +' has left '+ channelName + ( typeof message === 'undefined' ? '': ': ' +  message ) ) + '</span>' );
 			$userSidebar.find( 'div.userlist[title="' + nick + '"]' ).remove();
 			channels[ channelName ].user.update();
 		}
 		this.quit = function(nick, message){
 			if ( $userSidebar.find( 'div.userlist[title="' + nick + '"]' ).length > 0 ){
-				channels[ channelName ].line( '<span class="quit">' + compose.html( nick + ' has quit: ' + message ) + '</span>' );
+				if ( options.joins === true ) channels[ channelName ].line( '<span class="quit">' + compose.html( nick + ' has quit: ' + message ) + '</span>' );
 				$userSidebar.find( 'div.userlist[title="' + nick + '"]' ).remove();
 				channels[ channelName ].user.update();
 			}

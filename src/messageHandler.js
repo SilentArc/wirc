@@ -141,7 +141,7 @@
 			else {
 				var consumingModes = ['O','o','v','k','l','b','e','I'];	// this should be outside? maybe the entire parser should be?
 
-				channels[ message.params[ 0 ] ].line( '<span class="nick">' + compose.html( ( message.prefix === null ? config.nick : message.prefix.split( '!' )[ 0 ] ) + ' has set mode: ' + message.params.slice( 1 ).join( ' ' ) ) + '</span>');
+				if ( options.modes === true ) channels[ message.params[ 0 ] ].line( '<span class="nick">' + compose.html( ( message.prefix === null ? config.nick : message.prefix.split( '!' )[ 0 ] ) + ' has set mode: ' + message.params.slice( 1 ).join( ' ' ) ) + '</span>');
 				
 				var modeArray = message.params.slice( 1 );
 				while ( modeArray.length > 0 ){
