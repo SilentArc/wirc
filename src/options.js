@@ -33,12 +33,12 @@
 				if ( typeof effectCallback === 'function' ) effectCallback();
 			});
 		},
-		input: function ( id, text, effectCallback ){
+		input: function ( id, text, sanity, effectCallback ){
 			$( 'div.optionBox' ).append( '<div class="option" id="option_' + id + '">' + text + ': <input class="optionInput" data-id="' + id + '" value="' + ( options[ id ] === null ? '' : options[ id ] ) + '"><button class="optionButton" data-id="' + id + '" title="Sir, Are you sure that\'s wise? Sir? SIR?">Set</button></div>' );
 			$( 'button.optionButton[data-id="' + id + '"]' ).on( 'click', function( event ){
 				event.preventDefault();
 				var id = $( this ).attr( 'data-id' );
-				options[ id ] = compose.saneInput( $( 'input.optionInput[data-id="' + id + '"]' ).val() );
+				options[ id ] = ( sanity === 'message' ? compose.saneMessage( $( 'input.optionInput[data-id="' + id + '"]' ).val() ) : compose.saneInput( $( 'input.optionInput[data-id="' + id + '"]' ).val() ) );
 				saveOptions();
 				$( '#option_' + id ).append( '<span class="optionResult">Saved!</span>' );
 				setTimeout( function(){
@@ -98,10 +98,10 @@
 
 	optionUI.spacer( 'Self' );
 	optionUI.toggle( 'saveNick', 'Keep nickname for future sessions' );
-	optionUI.input( 'nick', 'Your nickname', function(){
+	optionUI.input( 'nick', 'Your nickname', 'input', function(){
 		irc.nick( options.nick );
 	});
-	optionUI.input( 'token', 'Login token or password' );
+	optionUI.input( 'token', 'Login token or password', 'message' );
 	optionUI.spacer('Console');
 	optionUI.toggle('pings','Show pings/pongs');
 	optionUI.toggle('console','Show Console', function(){
