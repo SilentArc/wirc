@@ -135,14 +135,14 @@
 	});
 	optionUI.toggle('snap','Snap on channel open');
 	optionUI.toggle('timestamp','Show timestamps', function(){
-		options.timestamp === true ? $( 'div.time' ).show() : $( 'div.time' ).hide();
+		options.timestamp === true ? $( 'div.time' ).removeClass( 'hidden' ) : $( 'div.time' ).addClass( 'hidden' );
 	});
 	optionUI.toggle( 'highlight','Highlight lines containing own nickname' );
 	//optionUI.toggle('part','Close on part');
 	optionUI.selector( 'images', 'Display inline images:', [ 'all', 'approved', 'none' ] );
 	optionUI.toggle('ircstyles','Allow irc style formatted text');
 	optionUI.spacer('Other');
-	optionUI.toggle('debug','debug shit');
+	optionUI.toggle('debug','Unnecessary extra information for debugging');
 	optionUI.spacer('Users');
 	optionUI.toggle('ignoreConsole','Send ignored user messages to the console');
 	optionUI.toggle('ignoreFollow','Follow nick changes and ignore those as well');

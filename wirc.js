@@ -1,4 +1,4 @@
-/*! wirc - v0.0.523 - 2016-03-27 */
+/*! wirc - v0.0.526 - 2016-03-28 */
 
 (function(){
 	var address = $( document.currentScript ).attr( 'data-addr' );
@@ -10,7 +10,7 @@
 		'alternating': true,
 		'snap': true,
 		'timestamp': true,
-		'part': false,
+	//	'part': false,
 		'console': true,
 		'ircstyles': true,
 		'debug': false,
@@ -252,7 +252,7 @@
 		},
 		'timestamp': function( stamp ){
 			var now = ( typeof stamp === 'undefined' ? new Date(): new Date( stamp ) );
-			return '<div class="time">[' + ( '0' + now.getHours() ).slice( -2 ) + ':' + ( '0' + now.getMinutes() ).slice( -2 ) + ':' + ( '0' + now.getSeconds() ).slice( -2 ) + ']</div>';
+			return '<div class="time' + ( options.timestamp === false ? ' hidden' : '' ) + '">[' + ( '0' + now.getHours() ).slice( -2 ) + ':' + ( '0' + now.getMinutes() ).slice( -2 ) + ':' + ( '0' + now.getSeconds() ).slice( -2 ) + ']</div>';
 			//return '<div class="time">[' + new Date().toLocaleTimeString() + ']</div>';
 		}
 	}
@@ -546,7 +546,8 @@
 			forward.console( compose.text( message.params[ 1 ] ) );
 		},
 		'004': function( message ){	// RPL_MYINFO
-			forward.console( compose.text('Server ' + message.params[ 1 ] + ' version ' + message.params[ 2 ] + ' supporting user modes "' + message.params[ 3 ] + '" and channel modes "' + message.params[ 4 ] +'"' ) );
+			if ( message.params.length > 2 ) forward.console( compose.text('Server ' + message.params[ 1 ] + ' version ' + message.params[ 2 ] + ' supporting user modes "' + message.params[ 3 ] + '" and channel modes "' + message.params[ 4 ] +'"' ) );
+			else forward.console( compose.text( message.params[ 1 ] ) );
 		},
 		'005': function( message ){	// RPL_BOUNCE or RPL_ISUPPORT
 			forward.console( 'This server supports: ' + compose.text( message.params.slice( 1 ).join( ' ' ) ) );
@@ -954,7 +955,7 @@
 			var displayNick = $userSidebar.find( 'div.userlist[title="' + target + '"]' ).text();
 			if ( displayNick.indexOf( config.modeMap[ mode ] ) === -1 ){
 				$userSidebar.find( 'div.userlist[title="' + target + '"]' ).remove();
-				channels[ channelName ].user.add( target, config.modeMap[ mode ] + displayNick );
+				channels[ channelName ].user.add( target, config.modeMap[ mode ] + ( displayNick.length === 0 ? target : displayNick ) );
 				channels[ channelName ].user.update();
 			}
 		}
@@ -1046,6 +1047,7 @@
 		if (isConsole === true){
 			$('#chatHead').append('<div class="channelSwitch" title=":Console">&nbsp;&gt;&nbsp;</div>');
 			var $channelSwitch = $('div.channelSwitch[title=":Console"]');
+			if ( options.console === false ) $channelSwitch.hide();
 			$channelSwitch.on('click', function(e){
 				$('#dropdownMenu').remove();
 				if ( $chatArea.is(":visible") === false ){
@@ -1371,14 +1373,14 @@
 	});
 	optionUI.toggle('snap','Snap on channel open');
 	optionUI.toggle('timestamp','Show timestamps', function(){
-		options.timestamp === true ? $( 'div.time' ).show() : $( 'div.time' ).hide();
+		options.timestamp === true ? $( 'div.time' ).removeClass( 'hidden' ) : $( 'div.time' ).addClass( 'hidden' );
 	});
 	optionUI.toggle( 'highlight','Highlight lines containing own nickname' );
 	//optionUI.toggle('part','Close on part');
 	optionUI.selector( 'images', 'Display inline images:', [ 'all', 'approved', 'none' ] );
 	optionUI.toggle('ircstyles','Allow irc style formatted text');
 	optionUI.spacer('Other');
-	optionUI.toggle('debug','debug shit');
+	optionUI.toggle('debug','Unnecessary extra information for debugging');
 	optionUI.spacer('Users');
 	optionUI.toggle('ignoreConsole','Send ignored user messages to the console');
 	optionUI.toggle('ignoreFollow','Follow nick changes and ignore those as well');

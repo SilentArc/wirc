@@ -8,7 +8,7 @@
 		'alternating': true,
 		'snap': true,
 		'timestamp': true,
-		'part': false,
+	//	'part': false,
 		'console': true,
 		'ircstyles': true,
 		'debug': false,

@@ -167,7 +167,7 @@
 			var displayNick = $userSidebar.find( 'div.userlist[title="' + target + '"]' ).text();
 			if ( displayNick.indexOf( config.modeMap[ mode ] ) === -1 ){
 				$userSidebar.find( 'div.userlist[title="' + target + '"]' ).remove();
-				channels[ channelName ].user.add( target, config.modeMap[ mode ] + displayNick );
+				channels[ channelName ].user.add( target, config.modeMap[ mode ] + ( displayNick.length === 0 ? target : displayNick ) );
 				channels[ channelName ].user.update();
 			}
 		}

@@ -232,7 +232,8 @@
 			forward.console( compose.text( message.params[ 1 ] ) );
 		},
 		'004': function( message ){	// RPL_MYINFO
-			forward.console( compose.text('Server ' + message.params[ 1 ] + ' version ' + message.params[ 2 ] + ' supporting user modes "' + message.params[ 3 ] + '" and channel modes "' + message.params[ 4 ] +'"' ) );
+			if ( message.params.length > 2 ) forward.console( compose.text('Server ' + message.params[ 1 ] + ' version ' + message.params[ 2 ] + ' supporting user modes "' + message.params[ 3 ] + '" and channel modes "' + message.params[ 4 ] +'"' ) );
+			else forward.console( compose.text( message.params[ 1 ] ) );
 		},
 		'005': function( message ){	// RPL_BOUNCE or RPL_ISUPPORT
 			forward.console( 'This server supports: ' + compose.text( message.params.slice( 1 ).join( ' ' ) ) );

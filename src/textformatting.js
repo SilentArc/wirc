@@ -131,7 +131,7 @@
 		},
 		'timestamp': function( stamp ){
 			var now = ( typeof stamp === 'undefined' ? new Date(): new Date( stamp ) );
-			return '<div class="time">[' + ( '0' + now.getHours() ).slice( -2 ) + ':' + ( '0' + now.getMinutes() ).slice( -2 ) + ':' + ( '0' + now.getSeconds() ).slice( -2 ) + ']</div>';
+			return '<div class="time' + ( options.timestamp === false ? ' hidden' : '' ) + '">[' + ( '0' + now.getHours() ).slice( -2 ) + ':' + ( '0' + now.getMinutes() ).slice( -2 ) + ':' + ( '0' + now.getSeconds() ).slice( -2 ) + ']</div>';
 			//return '<div class="time">[' + new Date().toLocaleTimeString() + ']</div>';
 		}
 	}

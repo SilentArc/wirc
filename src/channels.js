@@ -33,6 +33,7 @@
 		if (isConsole === true){
 			$('#chatHead').append('<div class="channelSwitch" title=":Console">&nbsp;&gt;&nbsp;</div>');
 			var $channelSwitch = $('div.channelSwitch[title=":Console"]');
+			if ( options.console === false ) $channelSwitch.hide();
 			$channelSwitch.on('click', function(e){
 				$('#dropdownMenu').remove();
 				if ( $chatArea.is(":visible") === false ){

@@ -43,7 +43,8 @@ a.url { word-break: break-all; }
 	.ircText .messageContainer { order: 2; white-space: pre-wrap; flex-grow: 1; overflow-x: inherit; }
 	.ircText .spacer{color: slategrey;}
 	.ircText .action {color: midnightblue;}
-	.ircText .time { color: dimgrey; order: 1; float: left; padding-right: 5px;}
+	.ircText .time { color: dimgrey; order: 1; float: left; padding-right: 5px; }
+	.ircText .time.hidden { display: none; }
 	.ircText .mode {color: darkgrey;}
 	.ircText .join {color: darkgreen;}
 	.ircText .nick {color: darkgreen;}
