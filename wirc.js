@@ -1,4 +1,4 @@
-/*! wirc - v0.0.536 - 2016-04-09 */
+/*! wirc - v0.0.537 - 2016-04-09 */
 
 (function(){
 	var address = $( document.currentScript ).attr( 'data-addr' );
@@ -344,6 +344,7 @@
 				else parsedMessage.tags[ tag ] = value.replace( /\\:/g, ';' ).replace( /\\s:/g, ' ' ).replace( /\\/g, '\\' );
 				return '';
 			});
+			return '';
 		});
 		message = message.replace( parserRegex.prefix, function ( match, prefix ){
 			parsedMessage.prefix = prefix;
@@ -541,7 +542,7 @@
 			else channels[ message.params[ 0 ] ].user.kick( message.params[ 1 ] , message.params[ 2 ] );	
 		},
 		'TOPIC': function( message ){
-			forward.channel( message.params[ 0 ], '<span class="info">' + compose.text( message.prefix.split('!')[0] + ' has changed the topic for ' +  message.params[ 0 ] + ' to "' + message.params[ 1 ] + '"' ) + '</span>' );
+			if ( message.self === false )forward.channel( message.params[ 0 ], '<span class="info">' + compose.text( message.prefix.split('!')[0] + ' has changed the topic for ' +  message.params[ 0 ] + ' to "' + message.params[ 1 ] + '"' ) + '</span>' );
 		},
 		'ERROR': function( message ){
 			forward.console( compose.text( message.raw ) );
