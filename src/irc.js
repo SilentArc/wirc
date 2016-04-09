@@ -75,8 +75,8 @@
 				for ( var index = 0; index < requestedCAPs.length; index++ ){
 					if ( config.CAP.LS.indexOf( requestedCAPs[ index ] ) !== -1  ) requests.push( requestedCAPs[ index ] );
 				}
-				if ( config.CAP.LS.indexOf( 'sasl' ) !== -1 && options.token !== null ) requests.push( 'sasl' );
-				else if ( options.token !== null ) irc.sendNow( 'PASS ' + options.token );
+				if ( config.CAP.LS.indexOf( 'sasl' ) !== -1 && options.token !== null && options.token.length > 0 ) requests.push( 'sasl' );
+				else if ( options.token !== null && options.token.length > 0 ) irc.sendNow( 'PASS ' + options.token );
 				irc.sendNow('NICK ' + config.nick );
 				irc.sendNow('USER ' + config.nick + ' ' + config.nick + ' ' + config.nick +' :' + config.nick);
 				if ( requests.length > 0 ){

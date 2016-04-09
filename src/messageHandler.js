@@ -7,6 +7,13 @@
 		else if ( options.debug === true ) forward.console( 'Unsupported command: ' + compose.text( message.raw ) );
 	}
 
+	var parserRegex = {
+		'tags': /^@\S+\s/g,
+		'tagParser': /(?:([^;=\s]+)(?:=([^;\s]+))?)/g,
+		'prefix': /^(?::(\S+)\s)/g,
+		'params': /^(?:([^:\s]+)\s?)/g
+	};
+
 	function parseMessage ( message ){
 		var parsedMessage = {
 			raw: message,
@@ -17,25 +24,29 @@
 			self: false
 		}
 
-		var splitLine = message.split( ' ' );	// this is going to eat trailing spaces, needs a better design
-		if ( splitLine[ 0 ].charCodeAt( 0 ) === 64 ){
-			var tags = splitLine.shift();
-			tags = tags.split( ';' );
-			for ( var index = 0; index < tags.length; index++ ){
-				if ( tags[ index ].indexOf( '=' ) === -1 ) parsedMessage.tags[ tags[ index ]] = true;
-				else parsedMessage.tags[ tags[ index ].split( '=' )[ 0 ] ] = tags[ index ].split( '=' )[ 1 ];
-			}
-		}
-		if ( splitLine[ 0 ].charCodeAt( 0 ) === 58 ) parsedMessage.prefix = splitLine.shift().slice( 1 );
-		parsedMessage.command = splitLine.shift();
+		message = message.replace( parserRegex.tags, function( match ){
+			match.slice( 1 ).replace( parserRegex.tagParser, function ( match, tag, value ){
+				if ( value === undefined ) parsedMessage.tags[ tag ] = true;
+				else parsedMessage.tags[ tag ] = value.replace( /\\:/g, ';' ).replace( /\\s:/g, ' ' ).replace( /\\/g, '\\' );
+				return '';
+			});
+		});
+		message = message.replace( parserRegex.prefix, function ( match, prefix ){
+			parsedMessage.prefix = prefix;
+			return '';
+		});
 		var lastParam = false;
-		while ( lastParam === false && splitLine.length > 0 ) {
-			if ( lastParam === false && splitLine[ 0 ].charCodeAt( 0 ) === 58 ) {
-				lastParam = true;
-				parsedMessage.params.push( splitLine.join( ' ' ).slice( 1 ) );
-			}
-			else parsedMessage.params.push( splitLine.shift() );
+		while ( lastParam === false && message.length > 0 ){
+			lastParam = true;
+			message = message.replace( parserRegex.params, function ( match, param ){
+				if ( parsedMessage.command === null ) parsedMessage.command = param;
+				else parsedMessage.params.push( param );
+				lastParam = false;
+				return '';
+			});
 		}
+		if ( message.length > 0 ) parsedMessage.params.push( message.slice( 1 ) );
+
 		return parsedMessage;
 	}
 
@@ -101,7 +112,6 @@
 				}
 			}
 			else channels[ message.params[ 0 ] ].user.join( message.prefix.split('!')[0]);
-
 		},
 		'PRIVMSG': function( message ){
 			var source = ( message.self === true ? config.nick : message.prefix.split( '!' )[ 0 ] );
