@@ -1,4 +1,4 @@
-/*! wirc - v0.0.537 - 2016-04-09 */
+/*! wirc - v0.0.540 - 2016-05-18 */
 
 (function(){
 	var address = $( document.currentScript ).attr( 'data-addr' );
@@ -325,7 +325,7 @@
 		'tags': /^@\S+\s/g,
 		'tagParser': /(?:([^;=\s]+)(?:=([^;\s]+))?)/g,
 		'prefix': /^(?::(\S+)\s)/g,
-		'params': /^(?:([^:\s]+)\s?)/g
+		'params': /^(?:([^:][^\s]*)\s?)/g
 	};
 
 	function parseMessage ( message ){
@@ -371,46 +371,48 @@
 			if ( options.pings === true ) forward.console( compose.html( 'Received ping (' + message.raw + '), replied pong (PONG ' + message.params[ 0 ] + ')' ) );
 		},
 		'CAP': function( message ){
-			if ( message.params[ 1 ] === 'LS' ) {
-				if ( typeof config.CAP === 'undefined' ) config.CAP = {};
-				if ( message.params[ 2 ] === '*' ) {
-					if ( config.CAP.multilineLS === false ) config.CAP.LS = message.params[ 3 ];
-					else config.CAP.LS += ' ' + message.params[ 3 ];
-					config.CAP.multilineLS = true;
-					forward.active( 'Server capabilities: ' + message.params[ 3 ] );
+			if ( message.self === false ){
+				if ( message.params[ 1 ] === 'LS' ) {
+					if ( typeof config.CAP === 'undefined' ) config.CAP = {};
+					if ( message.params[ 2 ] === '*' ) {
+						if ( config.CAP.multilineLS === false ) config.CAP.LS = message.params[ 3 ];
+						else config.CAP.LS += ' ' + message.params[ 3 ];
+						config.CAP.multilineLS = true;
+						forward.active( 'Server capabilities: ' + message.params[ 3 ] );
+					}
+					else {
+						if ( config.CAP.multilineLS === true ) config.CAP.LS += ' ' + message.params[ 2 ];
+						else config.CAP.LS = message.params[ 2 ];
+						config.CAP.multilineLS = false;
+						if ( registrationState === 0 ) {
+							registrationState = 1;
+							irc.login();
+						}
+						forward.active( 'Server capabilities: ' + message.params[ 2 ] );
+					}
 				}
-				else {
-					if ( config.CAP.multilineLS === true ) config.CAP.LS += ' ' + message.params[ 2 ];
-					else config.CAP.LS = message.params[ 2 ];
-					config.CAP.multilineLS = false;
-					if ( registrationState === 0 ) {
-						registrationState = 1;
+				else if ( message.params[ 1 ] === 'ACK' ){
+					if ( options.debug ) forward.console( 'CAP negotiation accepted: ' + message.params[ 2 ] );
+					config.CAP.ACK = message.params[ 2 ];
+					if ( registrationState === 1 ) {
+						registrationState = 2;
 						irc.login();
 					}
-					forward.active( 'Server capabilities: ' + message.params[ 2 ] );
 				}
-			}
-			else if ( message.params[ 1 ] === 'ACK' ){
-				if ( options.debug ) forward.console( 'CAP negotiation accepted: ' + message.params[ 2 ] );
-				config.CAP.ACK = message.params[ 2 ];
-				if ( registrationState === 1 ) {
-					registrationState = 2;
-					irc.login();
+				else if ( message.params[ 1 ] === 'NAK' ){
+					if ( options.debug ) forward.console( 'CAP negotiation rejected: ' + message.params[ 2 ] );
+					if ( typeof config.CAP.ACK === 'undefined' ) config.CAP.ACK = '';
+					if ( registrationState === 1 ) {
+						registrationState = 2;
+						irc.login();
+					}
 				}
-			}
-			else if ( message.params[ 1 ] === 'NAK' ){
-				if ( options.debug ) forward.console( 'CAP negotiation rejected: ' + message.params[ 2 ] );
-				if ( typeof config.CAP.ACK === 'undefined' ) config.CAP.ACK = '';
-				if ( registrationState === 1 ) {
-					registrationState = 2;
-					irc.login();
+				else if ( message.params[ 1 ] === 'LIST' ){
+					forward.active( 'Currently enabled capabilities: ' + message.params[ 2 ] );
 				}
-			}
-			else if ( message.params[ 1 ] === 'LIST' ){
-				forward.active( 'Currently enabled capabilities: ' + message.params[ 2 ] );
-			}
-			else {
-				forward.console( 'Unrecognised CAP command: ' + message.params.slice( 1 ).join( ' ' ) );
+				else {
+					forward.console( 'Unrecognised CAP command: ' + message.params.slice( 1 ).join( ' ' ) );
+				}
 			}
 		},
 		'AUTHENTICATE': function( message ){	// for SASL
@@ -1539,7 +1541,7 @@
 				if ( config.CAP.LS.indexOf( 'sasl' ) !== -1 && options.token !== null && options.token.length > 0 ) requests.push( 'sasl' );
 				else if ( options.token !== null && options.token.length > 0 ) irc.sendNow( 'PASS ' + options.token );
 				irc.sendNow('NICK ' + config.nick );
-				irc.sendNow('USER ' + config.nick + ' ' + config.nick + ' ' + config.nick +' :' + config.nick);
+				irc.sendNow('USER ' + config.nick + ' 0 * :' + config.nick);
 				if ( requests.length > 0 ){
 					var requestsString = '';
 					if ( requests.length == 1 ) requestsString = requests[ 0 ];

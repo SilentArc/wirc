@@ -78,7 +78,7 @@
 				if ( config.CAP.LS.indexOf( 'sasl' ) !== -1 && options.token !== null && options.token.length > 0 ) requests.push( 'sasl' );
 				else if ( options.token !== null && options.token.length > 0 ) irc.sendNow( 'PASS ' + options.token );
 				irc.sendNow('NICK ' + config.nick );
-				irc.sendNow('USER ' + config.nick + ' ' + config.nick + ' ' + config.nick +' :' + config.nick);
+				irc.sendNow('USER ' + config.nick + ' 0 * :' + config.nick);
 				if ( requests.length > 0 ){
 					var requestsString = '';
 					if ( requests.length == 1 ) requestsString = requests[ 0 ];
