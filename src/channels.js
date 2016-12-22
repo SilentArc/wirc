@@ -153,7 +153,10 @@
 			else if ( type === 'error' ) appendage += ' error';
 			else if ( type === 'info' ) appendage += ' info';
 			else if ( type === 'warning' ) appendage += ' warning';
-			else if ( options.highlight === true && message.search( config.nickRegex ) !== -1 ) appendage += ' highlight';
+			else if ( options.highlight === true && message.search( config.nickRegex ) !== -1 ) {
+				appendage += ' highlight';
+				if ( options.highlightNotify === true ) notifier.pop( 'Highlight!', 'Someone mentioned your nick in ' + channelName );
+			}
 			appendage += '">' + compose.timestamp( typeof timestamp === 'undefined' ? void( 0 ) : timestamp ) + ' ';
 			appendage += '<div class="messageContainer';
 			if ( type === 'notice' ) appendage += ' notice';

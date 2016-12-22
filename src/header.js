@@ -1,3 +1,4 @@
+'use strict';
 (function(){
 	var address = $( document.currentScript ).attr( 'data-addr' );
 	var options = {
@@ -17,6 +18,7 @@
 		'ignoreFollow': true,
 		'ignoreAbandon': false,
 		'highlight': true,
+		'highlightNotify': true,
 		'saveNick': true,
 		'saveChannels': true,
 		'nick': null,

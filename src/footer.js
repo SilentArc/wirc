@@ -1,4 +1,5 @@
 	$( document ).ready( function() {
+		if ( options.highlightNotify === true ) notifier.enable();
 		socket.connect();
 	});
 

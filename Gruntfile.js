@@ -10,6 +10,7 @@ module.exports = function(grunt) {
 				src: [
 					'src/header.js',
 					'src/textformatting.js',
+					'src/notifier.js',
 					'src/events.js',
 					'src/messageHandler.js',
 					'src/channelElements.js',

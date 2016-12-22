@@ -51,6 +51,55 @@
 		return parsedMessage;
 	}
 
+	var forward = {
+		'channel': function( target, message, type ){
+			if ( channels[target] !== undefined ) channels[target].line( message, type );
+			else {
+				newChannel( target, false, false);
+				channels[target].line( message, type );
+			}
+		},
+		//'all': function( message ){	// this is not used, remove?
+		//	for ( var index in channels ) channels[ index ].line( message );
+		//},
+		'console': function( message, type ){
+			channels[ ':Console' ].line( message, type );
+		},
+		'active': function( message, type ){
+			var active = $( 'div.chatArea:visible' ).attr( 'title' );
+			if ( active !== undefined ) forward.channel( active, message, type );
+			else forward.console( message, type );
+		},
+		'notification': function( message, type ){
+			var active = $( 'div.chatArea:visible' ).attr( 'title' );
+			if ( active !== undefined && active.charAt( 0 ) !== ':' ) forward.channel( active, message, type );
+			forward.console( message, type );
+		},
+		'ignore': function ( message ){
+			if ( options.ignoreConsole === true ) forward.console( message );
+		},
+		'alias': {
+			'consoleText': function( message ){
+				forward.console( compose.text( message.params[ 1 ] ) );
+			},
+			'consoleTrim' : function( message ){
+				forward.console( compose.text( message.params.slice( 1 ).join( ' ' ) ) );
+			},
+			'active': function( message ){
+				forward.active( compose.html( message.params[ 1 ] ) );
+			},
+			'activeTwoParams' : function( message ){
+				forward.active( compose.html( message.params[ 1 ] + ' ' + message.params[ 2 ] ) );
+			},
+			'activeWarning' : function( message ){	
+				forward.active( compose.html( message.params[ 1 ] ), 'warning' );
+			},
+			'activeError' : function( message ){
+				forward.active( compose.html( message.params[ 2 ] ), 'error' );
+			}
+		}
+	}
+
 	var commandLookup = {
 		'PING': function( message ){
 			irc.sendNow( 'PONG ' + message.params[ 0 ] );
@@ -235,17 +284,11 @@
 		'ERROR': function( message ){
 			forward.console( compose.text( message.raw ) );
 		},
-		'001': function( message ){	// RPL_WELCOME
-			forward.console( compose.text( message.params[ 1 ] ) );
-		},
-		'002': function( message ){	// RPL_YOURHOST
-			forward.console( compose.text( message.params[ 1 ] ) );
-		},
-		'003': function( message ){	// RPL_CREATED
-			forward.console( compose.text( message.params[ 1 ] ) );
-		},
+		'001': forward.alias.consoleText,	// RPL_WELCOME
+		'002': forward.alias.consoleText,	// RPL_YOURHOST
+		'003': forward.alias.consoleText,	// RPL_CREATED
 		'004': function( message ){	// RPL_MYINFO
-			if ( message.params.length > 2 ) forward.console( compose.text('Server ' + message.params[ 1 ] + ' version ' + message.params[ 2 ] + ' supporting user modes "' + message.params[ 3 ] + '" and channel modes "' + message.params[ 4 ] +'"' ) );
+			if ( message.params.length > 2 ) forward.console( compose.text( 'Server ' + message.params[ 1 ] + ' version ' + message.params[ 2 ] + ' supporting user modes "' + message.params[ 3 ] + '" and channel modes "' + message.params[ 4 ] +'"' ) );
 			else forward.console( compose.text( message.params[ 1 ] ) );
 		},
 		'005': function( message ){	// RPL_BOUNCE or RPL_ISUPPORT
@@ -266,27 +309,13 @@
 				config.modeMap[ modeLetters[ index ] ] = config.modeSymbols[ index ];
 			}
 		},
-		'251': function( message ){	// RPL_LUSERCLIENT
-			forward.console( compose.text( message.params[ 1 ] ) );
-		},
-		'252': function( message ){	// RPL_LUSEROP
-			forward.console( compose.text( message.params.slice( 1 ).join( ' ' ) ) );
-		},
-		'253': function( message ){	// RPL_LUSERUNKNOWN
-			forward.console( compose.text( message.params.slice( 1 ).join( ' ' ) ) );
-		},
-		'254': function( message ){	// RPL_LUSERCHANNELS
-			forward.console( compose.text( message.params.slice( 1 ).join( ' ' ) ) );
-		},
-		'255': function( message ){	// RPL_LUSERME
-			forward.console( compose.text( message.params[ 1 ] ) );
-		},
-		'265': function( message ){	// RPL_LOCALUSERS
-			forward.console( compose.text( message.params[ 1 ] ) );
-		},
-		'266': function( message ){	// RPL_GLOBALUSERS
-			forward.console( compose.text( message.params[ 1 ] ) );
-		},
+		'251': forward.alias.consoleText,	// RPL_LUSERCLIENT
+		'252': forward.alias.consoleTrim,	// RPL_LUSEROP
+		'253': forward.alias.consoleTrim,	// RPL_LUSERUNKNOWN
+		'254': forward.alias.consoleTrim,	// RPL_LUSERCHANNELS
+		'255': forward.alias.consoleText,	// RPL_LUSERME
+		'265': forward.alias.consoleText,	// RPL_LOCALUSERS
+		'266': forward.alias.consoleText,	// RPL_GLOBALUSERS
 		'315': function( message ){	// RPL_ENDOFWHO
 			forward.active( compose.text( message.params[ 1 ] + ' :' + message.params[ 2 ] ) );
 		},
@@ -311,9 +340,7 @@
 		'366': function( message ){	// RPL_ENDOFNAMES
 			channels[ message.params[ 1 ] ].user.handle366();
 		},
-		'372': function( message ){	// RPL_MOTD
-			forward.console( compose.text( message.params[ 1 ] ) );
-		},
+		'372': forward.alias.consoleText,	// RPL_MOTD
 		'375': function( message ){	// RPL_MOTDSTART
 			forward.console( compose.html( message.params[ 1 ] ) );
 		},
@@ -351,71 +378,24 @@
 				}
 			}
 		},
-		'461': function( message ){	// ERR_NEEDMOREPARAMS
-			forward.active( compose.html( message.params[ 1 ] + ' ' + message.params[ 2 ] ) );
-		},
-		'482': function( message ){	// ERR_CHANOPRIVSNEEDED
-			forward.active( compose.html( message.params[ 1 ] + ' ' + message.params[ 2 ] ) );
-		},
+		'461': forward.alias.activeTwoParams,	// ERR_NEEDMOREPARAMS
+		'482': forward.alias.activeTwoParams,	// ERR_CHANOPRIVSNEEDED
 		'900': function( message ){	// RPL_LOGGEDIN
 			forward.active( compose.html( 'SASL: ' + message.params[ 3 ] ) );
 		},
 		'901': function( message ){	// RPL_LOGGEDOUT
 			forward.active( compose.html( 'SASL: ' + message.params[ 2 ] ), 'warning' );
 		},
-		'902': function( message ){	// ERR_NICKLOCKED 
+		'902': function( message ){	// ERR_NICKLOCKED
 			forward.active( compose.html( 'SASL: ' + message.params[ 1 ] ), 'error' );
 		},
-		'903': function( message ){	// RPL_SASLSUCCESS
-			forward.active( compose.html( message.params[ 1 ] ) );
-		},
-		'904': function( message ){	// ERR_SASLFAIL
-			forward.active( compose.html( message.params[ 1 ] ), 'warning' );
-		},
-		'905': function( message ){	// ERR_SASLTOOLONG
-			forward.active( compose.html( message.params[ 1 ] ), 'warning' );
-		},
-		'906': function( message ){	// ERR_SASLABORTED
-			forward.active( compose.html( message.params[ 1 ] ), 'warning' );
-		},
-		'907': function( message ){	// ERR_SASLALREADY
-			forward.active( compose.html( message.params[ 1 ] ), 'warning' );
-		},
-		'908': function( message ){	// RPL_SASLMECHS
-			forward.active( compose.html( message.params[ 1 ] + ' ' + message.params[ 1 ] ) );
-		},
-		'926': function( message ){	// Channel forbidden
-			forward.active( compose.html( message.params[ 2 ] ), 'error' );
-		}
-	}
-	
-	var forward = {
-		'channel': function( target, message, type ){
-			if ( channels[target] !== undefined ) channels[target].line( message, type );
-			else {
-				newChannel( target, false, false);
-				channels[target].line( message, type );
-			}
-		},
-		//'all': function( message ){	// this is not used, remove?
-		//	for ( var index in channels ) channels[ index ].line( message );
-		//},
-		'console': function( message, type ){
-			channels[ ':Console' ].line( message, type );
-		},
-		'active': function( message, type ){
-			var active = $( 'div.chatArea:visible' ).attr( 'title' );
-			if ( active !== undefined ) forward.channel( active, message, type );
-			else forward.console( message, type );
-		},
-		'notification': function( message, type ){
-			var active = $( 'div.chatArea:visible' ).attr( 'title' );
-			if ( active !== undefined && active.charAt( 0 ) !== ':' ) forward.channel( active, message, type );
-			forward.console( message, type );
-		},
-		'ignore': function ( message ){
-			if ( options.ignoreConsole === true ) forward.console( message );
-		}
+		'903': forward.alias.active,	// RPL_SASLSUCCESS
+		'904': forward.alias.activeWarning,	// ERR_SASLFAIL
+		'905': forward.alias.activeWarning,	// ERR_SASLTOOLONG
+		'906': forward.alias.activeWarning,	// ERR_SASLABORTED
+		'907': forward.alias.activeWarning,	// ERR_SASLALREADY
+		'908': forward.alias.activeWarning,	// RPL_SASLMECHS
+		'926': forward.alias.activeError	// Channel forbidden
 	}
 	
 	function newChannel(channelName,sidebars,type){
@@ -429,7 +409,7 @@
 	}
 
 	function inputHandler( context, line ) {
-		if ( line.charCodeAt( 0 ) === 47 ) {
+		if ( line.charCodeAt( 0 ) === 47 ) {	// forward slash
 			var message = {
 				channel: context,
 				raw: line,

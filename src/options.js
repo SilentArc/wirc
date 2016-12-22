@@ -142,6 +142,9 @@
 	optionUI.selector( 'images', 'Display inline images:', [ 'all', 'approved', 'none' ] );
 	optionUI.toggle('ircstyles','Allow irc style formatted text');
 	optionUI.spacer('Other');
+	optionUI.toggle('highlightNotify','Display notifications on highlight ( if available )', function(){
+		options.highlightNotify === true ? notifier.enable() : notifier.disable();
+	});
 	optionUI.toggle('debug','Unnecessary extra information for debugging');
 	optionUI.spacer('Users');
 	optionUI.toggle('ignoreConsole','Send ignored user messages to the console');
