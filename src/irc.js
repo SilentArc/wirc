@@ -3,7 +3,7 @@
 	var reconnectCallback = null;
 	var sentMessageTimes = [];
 	for (var index = 0; index < config.sendLimitMessages; index++) sentMessageTimes.push( 0 );
-	var registrationState = 0;	// 0 unregistered send CAP LS, 1 CAP LS responce send CAP REQ, 2 CAP ACK/NAK send AUTH, 3 done GLHF
+	var registrationState = 0;	// 0 unregistered send CAP LS, 1 CAP LS responce send CAP REQ, 2 CAP ACK/NAK send AUTH, 3 AUTH sent waiting for responce, 4 done GLHF
 	var requestedCAPs = [ 'multi-prefix', 'twitch.tv/membership' ];
 	
 	var irc = {
@@ -89,9 +89,9 @@
 					irc.sendNow( 'CAP REQ ' + requestsString );
 				}
 			}
-			else if( registrationState === 2 && config.CAP.ACK.indexOf( 'sasl' ) !== -1 && options.token !== null ) irc.sendNow( 'AUTHENTICATE PLAIN' );
-			else {
-				registrationState = 3;
+			else if ( registrationState === 2 && config.CAP.ACK.indexOf( 'sasl' ) !== -1 && options.token !== null ) irc.sendNow( 'AUTHENTICATE PLAIN' );
+			else if ( registrationState < 4 ) {
+				registrationState = 4;
 				irc.sendNow( 'CAP END' );
 			}
 		},

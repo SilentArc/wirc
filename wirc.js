@@ -1,4 +1,4 @@
-/*! wirc - v0.0.547 - 2016-12-23 */
+/*! wirc - v0.0.551 - 2017-04-25 */
 
 'use strict';
 (function(){
@@ -428,8 +428,12 @@
 			'activeTwoParams' : function( message ){
 				forward.active( compose.html( message.params[ 1 ] + ' ' + message.params[ 2 ] ) );
 			},
-			'activeWarning' : function( message ){	
+			'activeWarning' : function( message ){
 				forward.active( compose.html( message.params[ 1 ] ), 'warning' );
+			},
+			'saslWarning' : function( message ){
+				forward.active( compose.html( message.params[ 1 ] ), 'warning' );
+				irc.login();
 			},
 			'activeError' : function( message ){
 				forward.active( compose.html( message.params[ 2 ] ), 'error' );
@@ -488,9 +492,10 @@
 			}
 		},
 		'AUTHENTICATE': function( message ){	// for SASL
-			if ( registrationState === 2 && options.token !== null && message.params[ 0 ] === '+' )	irc.sendNow( 'AUTHENTICATE ' + options.token );
-			registrationState = 3;
-			irc.login();
+			if ( registrationState === 2 && options.token !== null && message.params[ 0 ] === '+' )	{
+				irc.sendNow( 'AUTHENTICATE ' + options.token );
+				registrationState = 3;
+			}
 		},
 		'JOIN': function( message ){
 			if ( message.prefix.split('!')[ 0 ] === config.nick ) {
@@ -725,13 +730,17 @@
 		},
 		'902': function( message ){	// ERR_NICKLOCKED
 			forward.active( compose.html( 'SASL: ' + message.params[ 1 ] ), 'error' );
+			irc.login();
 		},
-		'903': forward.alias.active,	// RPL_SASLSUCCESS
-		'904': forward.alias.activeWarning,	// ERR_SASLFAIL
-		'905': forward.alias.activeWarning,	// ERR_SASLTOOLONG
-		'906': forward.alias.activeWarning,	// ERR_SASLABORTED
-		'907': forward.alias.activeWarning,	// ERR_SASLALREADY
-		'908': forward.alias.activeWarning,	// RPL_SASLMECHS
+		'903': function( message ){	// RPL_SASLSUCCESS
+			forward.active( compose.html( 'SASL: ' + message.params[ 1 ] ) );
+			irc.login();
+		},
+		'904': forward.alias.saslWarning,	// ERR_SASLFAIL
+		'905': forward.alias.saslWarning,	// ERR_SASLTOOLONG
+		'906': forward.alias.saslWarning,	// ERR_SASLABORTED
+		'907': forward.alias.saslWarning,	// ERR_SASLALREADY
+		'908': forward.alias.saslWarning,	// RPL_SASLMECHS
 		'926': forward.alias.activeError	// Channel forbidden
 	}
 	
@@ -1475,7 +1484,7 @@
 	var reconnectCallback = null;
 	var sentMessageTimes = [];
 	for (var index = 0; index < config.sendLimitMessages; index++) sentMessageTimes.push( 0 );
-	var registrationState = 0;	// 0 unregistered send CAP LS, 1 CAP LS responce send CAP REQ, 2 CAP ACK/NAK send AUTH, 3 done GLHF
+	var registrationState = 0;	// 0 unregistered send CAP LS, 1 CAP LS responce send CAP REQ, 2 CAP ACK/NAK send AUTH, 3 AUTH sent waiting for responce, 4 done GLHF
 	var requestedCAPs = [ 'multi-prefix', 'twitch.tv/membership' ];
 	
 	var irc = {
@@ -1561,9 +1570,9 @@
 					irc.sendNow( 'CAP REQ ' + requestsString );
 				}
 			}
-			else if( registrationState === 2 && config.CAP.ACK.indexOf( 'sasl' ) !== -1 && options.token !== null ) irc.sendNow( 'AUTHENTICATE PLAIN' );
-			else {
-				registrationState = 3;
+			else if ( registrationState === 2 && config.CAP.ACK.indexOf( 'sasl' ) !== -1 && options.token !== null ) irc.sendNow( 'AUTHENTICATE PLAIN' );
+			else if ( registrationState < 4 ) {
+				registrationState = 4;
 				irc.sendNow( 'CAP END' );
 			}
 		},
