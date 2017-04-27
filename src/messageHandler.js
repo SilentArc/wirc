@@ -156,7 +156,10 @@
 		},
 		'AUTHENTICATE': function( message ){	// for SASL
 			if ( registrationState === 2 && options.token !== null && message.params[ 0 ] === '+' )	{
-				irc.sendNow( 'AUTHENTICATE ' + options.token );
+				var encodedToken = btoa( encodeURIComponent( config.nick + '\u0000' + config.nick + '\u0000' + options.token ).replace( /%([0-9A-F]{2})/g, function( match, p1 ) {
+					return String.fromCharCode( '0x' + p1 );
+				} ) );
+				irc.sendNow( 'AUTHENTICATE ' + encodedToken );
 				registrationState = 3;
 			}
 		},

@@ -1,6 +1,6 @@
 {
   "name": "wirc",
-  "version": "0.0.552",
+  "version": "0.0.559",
   "private": true,
   "description": "websocket and jquery irc client",
   "author": "SilentArc",

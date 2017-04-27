@@ -1,4 +1,4 @@
-/*! wirc - v0.0.551 - 2017-04-25 */
+/*! wirc - v0.0.558 - 2017-04-27 */
 
 'use strict';
 (function(){
@@ -493,7 +493,10 @@
 		},
 		'AUTHENTICATE': function( message ){	// for SASL
 			if ( registrationState === 2 && options.token !== null && message.params[ 0 ] === '+' )	{
-				irc.sendNow( 'AUTHENTICATE ' + options.token );
+				var encodedToken = btoa( encodeURIComponent( config.nick + '\u0000' + config.nick + '\u0000' + options.token ).replace( /%([0-9A-F]{2})/g, function( match, p1 ) {
+					return String.fromCharCode( '0x' + p1 );
+				} ) );
+				irc.sendNow( 'AUTHENTICATE ' + encodedToken );
 				registrationState = 3;
 			}
 		},
@@ -1300,7 +1303,7 @@
 			});
 		},
 		input: function ( id, text, sanity, effectCallback ){
-			$( 'div.optionBox' ).append( '<div class="option" id="option_' + id + '">' + text + ': <input class="optionInput" data-id="' + id + '" value="' + ( options[ id ] === null ? '' : options[ id ] ) + '"><button class="optionButton" data-id="' + id + '" title="Sir, Are you sure that\'s wise? Sir? SIR?">Set</button></div>' );
+			$( 'div.optionBox' ).append( '<div class="option" id="option_' + id + '">' + text + ': <input type="text" class="optionInput" data-id="' + id + '" value="' + ( options[ id ] === null ? '' : options[ id ] ) + '"><button class="optionButton" data-id="' + id + '" title="Sir, Are you sure that\'s wise? Sir? SIR?">Set</button></div>' );
 			$( 'button.optionButton[data-id="' + id + '"]' ).on( 'click', function( event ){
 				event.preventDefault();
 				var id = $( this ).attr( 'data-id' );
@@ -1313,8 +1316,27 @@
 				if ( typeof effectCallback === 'function' ) effectCallback();
 			});
 		},
+		password: function ( id, text, sanity, effectCallback ){
+			$( 'div.optionBox' ).append( '<div class="option" id="option_' + id + '">' + text + ': <input type="password" class="optionInput" data-id="' + id + '" value="' + ( options[ id ] === null ? '' : options[ id ] ) + '"><button class="optionButton" data-id="' + id + '" title="Sir, Are you sure that\'s wise? Sir? SIR?">Set</button><button class="optionButton" data-id="showHide-' + id + '" title="Show/Hide Password">Show/Hide</button></div>' );
+			$( 'button.optionButton[data-id="' + id + '"]' ).on( 'click', function( event ){
+				event.preventDefault();
+				var id = $( this ).attr( 'data-id' );
+				options[ id ] = ( sanity === 'message' ? compose.saneMessage( $( 'input.optionInput[data-id="' + id + '"]' ).val() ) : compose.saneInput( $( 'input.optionInput[data-id="' + id + '"]' ).val() ) );
+				saveOptions();
+				$( '#option_' + id ).append( '<span class="optionResult">Saved!</span>' );
+				setTimeout( function(){
+					$( 'span.optionResult' ).remove();
+				}, 3000 );
+				if ( typeof effectCallback === 'function' ) effectCallback();
+			});
+			$( 'button.optionButton[data-id="showHide-' + id + '"]' ).on( 'click', function( event ){
+				event.preventDefault();
+				var $inputField = $( 'input.optionInput[data-id="' + id + '"]' );
+				$inputField.attr( 'type', ( $inputField.attr( 'type' ) === 'password' ? 'text': 'password' ) );
+			});
+		},
 		listInput: function( id, text, effectCallback ){
-			$( 'div.optionBox' ).append( '<div class="option" id="option_' + id + '">' + text + ': <input class="optionInput" data-id="' + id + '" value="' + ( options[ id ] === null ? '' : options[ id ] ) + '"><button class="optionButton" data-id="' + id + '" title="Sir, Are you sure that\'s wise? Sir? SIR?">Set</button></div>' );
+			$( 'div.optionBox' ).append( '<div class="option" id="option_' + id + '">' + text + ': <input type="text" class="optionInput" data-id="' + id + '" value="' + ( options[ id ] === null ? '' : options[ id ] ) + '"><button class="optionButton" data-id="' + id + '" title="Sir, Are you sure that\'s wise? Sir? SIR?">Set</button></div>' );
 			$( 'button.optionButton[data-id="' + id + '"]' ).on( 'click', function( event ){
 				event.preventDefault();
 				var id = $( this ).attr( 'data-id' );
@@ -1371,7 +1393,7 @@
 	optionUI.input( 'nick', 'Your nickname', 'input', function(){
 		irc.nick( options.nick );
 	});
-	optionUI.input( 'token', 'Login token or password', 'message' );
+	optionUI.password( 'token', 'Login token or password', 'message' );
 	optionUI.spacer('Console');
 	optionUI.toggle('pings','Show pings/pongs');
 	optionUI.toggle('console','Show Console', function(){
