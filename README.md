@@ -7,7 +7,7 @@ Include wirc.js or wirc.min.js with the data-addr attribute containing the locat
 Wirc will empty and fill the parental element and include wirc.css itself.
 ```HTML
 <div>
-	<span>javascript requirement warning</spam>
+	<span>javascript requirement warning</span>
 	<script src="wirc.js" data-addr="ws://websocketURL"></script>
 </div>
 ```

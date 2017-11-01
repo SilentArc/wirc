@@ -31,13 +31,13 @@ a.url { word-break: break-all; }
 .ircText { display: flex; width: 100%; overflow: auto; }
 .ircText.light {background-color: white; }
 .ircText.dark {background-color: whitesmoke; }
-.ircText.light.self {background-color: ghostwhite; }
+.ircText.light.self {background-color: #ececff; }
 .ircText.dark.self {background-color: lavender; }
 .ircText.light.info {background-color: honeydew; }
 .ircText.dark.info {background-color: #DDFFDD; }
 .ircText.light.error {background-color: lavenderblush; }
 .ircText.dark.error {background-color: mistyrose; }
-.ircText.light.highlight { background-color: floralwhite; }
+.ircText.light.highlight { background-color: #fef7ea; }
 .ircText.dark.highlight { background-color: papayawhip; }
 	.ircText .messageNick {color: midnightblue; cursor: pointer; }
 	.ircText .messageContainer { order: 2; white-space: pre-wrap; flex-grow: 1; overflow-x: inherit; }

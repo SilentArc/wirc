@@ -33,7 +33,7 @@
 			irc.sendNow( 'PART ' + channelName + ' :' + ( typeof reason !== 'undefined' ? reason : 'I clicked a thing!' ) );
 		},
 		'quit': function( message ){
-			preventReconnect = true;
+			socket.preventReconnect = true;
 			clearTimeout(manualTimeoutCallback);
 			if (typeof message === 'undefined') message = 'Kyaiee!';
 			irc.sendNow( 'QUIT :' + message );
