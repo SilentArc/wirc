@@ -1,9 +1,9 @@
-	$( document ).ready( function() {
+	$( function() {
 		if ( options.highlightNotify === true ) notifier.enable();
 		socket.connect();
 	});
 
-	$( window ).unload(function() {
+	$( window ).on( 'unload', function() {
 		irc.quit('Browser closed');
 	});
 	

@@ -1,4 +1,4 @@
-/*! wirc - v0.0.559 - 2017-11-01 */
+/*! wirc - v0.0.561 - 2018-01-17 */
 
 'use strict';
 (function(){
@@ -1617,12 +1617,12 @@
 		return 'Creep_' + Math.random().toString( 36 ).substring( 2, 9 );
 	}
 
-	$( document ).ready( function() {
+	$( function() {
 		if ( options.highlightNotify === true ) notifier.enable();
 		socket.connect();
 	});
 
-	$( window ).unload(function() {
+	$( window ).on( 'unload', function() {
 		irc.quit('Browser closed');
 	});
 	
